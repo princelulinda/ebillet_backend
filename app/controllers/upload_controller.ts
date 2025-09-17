@@ -12,7 +12,7 @@ export default class UploadController {
       name: fileName,
     })
 
-    const url = `/uploads/general/${fileName}`
+    
 
     // Construct the full URL
     const protocol = request.protocol()

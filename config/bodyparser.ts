@@ -27,7 +27,7 @@ const bodyParserConfig = defineConfig({
       'application/vnd.api+json',
       'application/csp-report',
     ],
-    processManually: ['/api/v1/stripe/webhook'],
+    
   },
 
   /**

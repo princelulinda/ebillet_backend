@@ -1,8 +1,8 @@
 import { HttpContext } from '@adonisjs/core/http'
-import Event from '#models/event'
+
 import TicketType from '#models/ticket_type'
 import Order from '#models/order'
-import Ticket from '#models/ticket'
+
 import StripeService from '#services/StripeService'
 import { purchaseTicketsValidator } from '#validators/purchase_tickets'
 import { v4 as uuidv4 } from 'uuid'

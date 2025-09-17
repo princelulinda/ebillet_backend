@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
 import User from '#models/user'
-import type { BelongsTo, MorphTo } from '@adonisjs/lucid/types/relations'
+import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 
 export default class UserFollow extends BaseModel {
   @column({ isPrimary: true })
@@ -25,11 +25,5 @@ export default class UserFollow extends BaseModel {
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>
 
-  followable(): MorphTo<any> {
-    return this.morphTo(['followableId', 'followableType'], {
-      Organization: () => import('#models/organization'),
-      Performer: () => import('#models/performer'),
-      Venue: () => import('#models/venue'),
-    })
-  }
+  
 }

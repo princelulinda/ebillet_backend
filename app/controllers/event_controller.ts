@@ -47,10 +47,10 @@ export default class EventController {
     const statsByEventId = new Map<number, { totalRevenue: number; ticketsSold: number }>()
 
     for (const ticket of tickets) {
-      const stats = statsByEventId.get(ticket.eventId) || { totalRevenue: 0, ticketsSold: 0 }
+      const stats = statsByEventId.get((ticket as any).eventId) || { totalRevenue: 0, ticketsSold: 0 }
       stats.totalRevenue += ticket.price
       stats.ticketsSold += 1
-      statsByEventId.set(ticket.eventId, stats)
+      statsByEventId.set((ticket as any).eventId, stats)
     }
 
     // 4. Augment event objects with their stats

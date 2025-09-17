@@ -61,7 +61,7 @@ export default class AuthController {
       .where('token', token)
       .first()
 
-    if (!emailVerificationToken || emailVerificationToken.expiresAt < DateTime.now()) {
+        if (!emailVerificationToken || !emailVerificationToken.expiresAt || emailVerificationToken.expiresAt < DateTime.now()) {
       return response.badRequest({ message: 'Invalid or expired token.' })
     }
 

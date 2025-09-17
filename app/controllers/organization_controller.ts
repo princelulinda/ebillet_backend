@@ -219,11 +219,11 @@ export default class OrganizationController {
       .orderBy('month', 'asc')
 
     // Format for chart
-    const categories = revenue.map((r) => {
+    const categories = revenue.map((r: any) => {
       const [year, month] = r.month.split('-')
       return new Date(Number(year), Number(month) - 1).toLocaleString('default', { month: 'short' })
     })
-    const seriesData = revenue.map((r) => Number(r.monthly_revenue)) // Ensure it's a number
+    const seriesData = revenue.map((r: any) => Number(r.monthly_revenue)) // Ensure it's a number
 
     const chartData = {
       series: [{ name: 'Revenue', data: seriesData }],
