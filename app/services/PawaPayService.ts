@@ -1,5 +1,4 @@
 import env from '#start/env'
-import { v4 as uuidv4 } from 'uuid'
 
 class PawaPayService {
   private pawaPayUrl: string
@@ -39,8 +38,7 @@ class PawaPayService {
     })
 
     if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.message || 'Failed to create deposit with PawaPay')
+      throw new Error('Failed to create deposit with PawaPay')
     }
 
     return response.json()
@@ -65,7 +63,7 @@ class PawaPayService {
     if (!response.ok) {
       const error = await response.json()
       console.log(error)
-      throw new Error(error.message || 'Failed to get active configuration from PawaPay')
+      throw new Error( 'Failed to get active configuration from PawaPay')
     }
 
     return response.json()
