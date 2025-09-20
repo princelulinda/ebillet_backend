@@ -18,6 +18,9 @@ export default class TicketType extends BaseModel {
   declare price: number
 
   @column()
+  declare currency: string
+
+  @column()
   declare availableQuantity: number
 
   @column()

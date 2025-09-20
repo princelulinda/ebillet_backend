@@ -4,6 +4,7 @@ import TicketType from '#models/ticket_type'
 import Order from '#models/order'
 
 import StripeService from '#services/StripeService'
+import PawaPayService from '#services/PawaPayService'
 import { purchaseTicketsValidator } from '#validators/purchase_tickets'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -11,16 +12,16 @@ export default class OrderController {
   async purchase({ request, auth, response, params }: HttpContext) {
     const user = auth.getUserOrFail()
     const eventId = params.eventId
-    const { tickets: ticketsToPurchase } = await request.validateUsing(purchaseTicketsValidator)
+    const { tickets: ticketsToPurchase, paymentMethod, paymentDetails } = await request.validateUsing(purchaseTicketsValidator)
 
     // 1. Fetch ticket types and calculate total amount
     let totalAmount = 0
+    let currency = ''
     const ticketTypeIds = ticketsToPurchase.map((t) => t.ticketTypeId)
     const ticketTypes = await TicketType.query()
       .whereIn('id', ticketTypeIds)
       .where('eventId', eventId)
 
-    // Ensure all requested ticket types were found for the event
     if (ticketTypes.length !== ticketTypeIds.length) {
       return response.badRequest('One or more ticket types are invalid for this event.')
     }
@@ -30,14 +31,15 @@ export default class OrderController {
     for (const item of ticketsToPurchase) {
       const ticketType = ticketTypeMap.get(item.ticketTypeId)
       if (!ticketType) {
-        // This case is already handled above, but as a safeguard
         return response.badRequest(`Ticket type with id ${item.ticketTypeId} not found.`)
       }
-      // Check availability
       if (ticketType.availableQuantity < item.quantity) {
         return response.badRequest(`Not enough tickets available for ${ticketType.name}.`)
       }
       totalAmount += ticketType.price * item.quantity
+      if (!currency) {
+        currency = ticketType.currency
+      }
     }
 
     // 2. Create a pending order
@@ -49,16 +51,52 @@ export default class OrderController {
       status: 'pending',
       lineItems: ticketsToPurchase,
     })
-    const amountInCents = Math.round(totalAmount * 100)
 
-    const paymentIntent = await StripeService.createPaymentIntent(amountInCents, 'usd')
-    order.paymentIntentId = paymentIntent.id
-    await order.save()
+    // 3. Handle payment based on the selected payment method
+    switch (paymentMethod) {
+      case 'stripe':
+        const amountInCents = Math.round(totalAmount * 100)
+        const paymentIntent = await StripeService.createPaymentIntent(amountInCents, currency)
+        order.paymentIntentId = paymentIntent.id
+        await order.save()
+        return response.ok({
+          clientSecret: paymentIntent.client_secret,
+          orderId: order.id,
+        })
 
-    return response.ok({
-      clientSecret: paymentIntent.client_secret,
-      orderId: order.id,
-    })
+      case 'pawapay':
+        if (!paymentDetails?.phoneNumber || !paymentDetails?.provider) {
+          return response.badRequest('phoneNumber and provider are required for PawaPay')
+        }
+
+        const depositId = uuidv4()
+        order.depositId = depositId
+        await order.save()
+
+        try {
+          const pawaPayResponse = await PawaPayService.createDeposit(
+            depositId,
+            totalAmount.toString(),
+            currency,
+            paymentDetails.phoneNumber,
+            paymentDetails.provider
+          )
+
+          return response.ok({
+            message: 'PawaPay deposit initiated successfully',
+            orderId: order.id,
+            depositId: depositId,
+            pawaPayResponse,
+          })
+        } catch (error) {
+          order.status = 'failed'
+          await order.save()
+          return response.internalServerError({ message: 'Failed to initiate PawaPay deposit', error: error.message })
+        }
+
+      default:
+        return response.badRequest('Invalid payment method')
+    }
   }
 
   async listMyOrders({ auth, request, response }: HttpContext) {
@@ -72,7 +110,6 @@ export default class OrderController {
       return order ? response.ok(order) : response.notFound()
     }
 
-    // If not filtering by paymentIntentId, proceed with other filters.
     if (status) {
       ordersQuery.where('status', status)
     }
@@ -90,7 +127,7 @@ export default class OrderController {
       .where('id', orderId)
       .andWhere('userId', user.id)
       .preload('event')
-      .preload('tickets') // Also loading the tickets for this order
+      .preload('tickets')
       .first()
 
     if (!order) {

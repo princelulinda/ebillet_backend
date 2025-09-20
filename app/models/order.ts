@@ -26,6 +26,9 @@ export default class Order extends BaseModel {
   @column()
   declare paymentIntentId: string | null
 
+  @column()
+  declare depositId: string | null
+
   @column({
     prepare: (value) => {
       if (value) {

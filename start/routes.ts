@@ -11,8 +11,11 @@ import PaymentMethodController from '#controllers/payment_method_controller'
 import UserController from '#controllers/user_controller'
 import ReviewController from '#controllers/review_controller'
 import StripeWebhookController from '#controllers/stripe_webhook_controller'
+import PawaPayWebhookController from '#controllers/pawa_pay_webhook_controller'
 import UploadController from '#controllers/upload_controller'
 import CategoryController from '#controllers/category_controller'
+import PawaPayController from '#controllers/pawa_pay_controller'
+
 
 router.get('/', async () => {
   return {
@@ -120,11 +123,7 @@ router
           .get('ticket-types/predefined', [TicketTypeController, 'getPredefinedTypes'])
           .use(middleware.auth())
 
-        // Purchase Tickets Route
-        router
-          .post(':organizationId/events/:eventId/purchase', [OrderController, 'purchase'])
-          .use(middleware.auth())
-      })
+    })
       .prefix('organizations')
 
     // Public Event Routes
@@ -133,11 +132,19 @@ router
     router.get('events/:id/reviews', [ReviewController, 'index'])
     router.post('events/:id/reviews', [ReviewController, 'store']).use(middleware.auth())
 
+    // Purchase Tickets Route
+    router.post('events/:eventId/purchase', [OrderController, 'purchase']).use(middleware.auth())
+
     // Categories Route
     router.get('categories', [CategoryController, 'index'])
 
     // Payment Methods Route
     router.get('payment-methods', [PaymentMethodController, 'index'])
+
+    // PawaPay Routes
+    router.get('pawa-pay/active-configuration', [PawaPayController, 'getActiveConfiguration'])
+    router.post('pawa-pay/deposit', [PawaPayController, 'createDeposit']).use(middleware.auth())
+    router.post('pawa-pay/webhook', [PawaPayWebhookController, 'handleWebhook'])
 
     // Generic Upload Route
     router.post('upload', [UploadController, 'store']).use(middleware.auth())

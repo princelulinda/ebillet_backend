@@ -8,5 +8,10 @@ export const purchaseTicketsValidator = vine.compile(
         quantity: vine.number().positive().min(1),
       })
     ),
+    paymentMethod: vine.enum(['stripe', 'pawapay']),
+    paymentDetails: vine.object({
+      phoneNumber: vine.string().optional(),
+      provider: vine.string().optional(),
+    }).optional(),
   })
 )
