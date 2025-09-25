@@ -14,13 +14,23 @@ class PawaPayService {
     amount: string,
     currency: string,
     phoneNumber: string,
-    provider: string
+    provider: string,
+    clientReferenceId: string,
+    customerMessage: string,
+    metadata: any[]
   ) {
     const url = new URL('v2/deposits', this.pawaPayUrl)
-    const response = await fetch(url.toString(), {
+    console.log(url)
+    const response = await fetch(url.href, {
       method: 'POST',
       headers: {
+        'Content-Digest': 'quis minim',
+        'Signature': 'culpa Excepteur',
+        'Signature-Input': 'aute adipisicing qui esse',
+        'Accept-Signature': 'eu exercitation',
+        'Accept-Digest': 'exercitation ea in laboris',
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
         'Authorization': `Bearer ${this.apiKey}`,
       },
       body: JSON.stringify({
@@ -34,10 +44,16 @@ class PawaPayService {
             provider,
           },
         },
+        preAuthorisationCode: '3c',
+        clientReferenceId,
+        customerMessage,
+        metadata,
       }),
     })
 
     if (!response.ok) {
+      const r = await response.json()
+      console.log(r, provider, phoneNumber, amount, currency, depositId)
       throw new Error('Failed to create deposit with PawaPay')
     }
 
