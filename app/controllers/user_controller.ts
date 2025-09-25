@@ -8,7 +8,7 @@ export default class UserController {
     const user = auth.getUserOrFail()
 
     const tickets = await Ticket.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .preload('order', (orderQuery) => {
         orderQuery.preload('event')
       })
@@ -22,7 +22,7 @@ export default class UserController {
 
     const followedOrgIds = (
       await UserFollow.query()
-        .where('userId', user.id)
+        .where('userId', user?.id)
         .where('followableType', 'Organization')
         .select('followableId')
     ).map((f) => f.followableId)

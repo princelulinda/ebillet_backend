@@ -21,7 +21,7 @@ export default class ReviewController {
 
     // Business logic: Check if user has a ticket for this event
     const hasTicket = await Ticket.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .whereHas('order', (orderQuery) => {
         orderQuery.where('eventId', eventId)
       })
@@ -33,7 +33,7 @@ export default class ReviewController {
 
     // Check if user has already reviewed this event
     const existingReview = await Review.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('eventId', eventId)
       .first()
 
@@ -43,7 +43,7 @@ export default class ReviewController {
 
     const review = await Review.create({
       ...payload,
-      userId: user.id,
+      userId: user?.id,
       eventId: Number(eventId),
     })
 

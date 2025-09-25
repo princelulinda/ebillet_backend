@@ -44,7 +44,7 @@ export default class OrderController {
 
     // 2. Create a pending order
     const order = await Order.create({
-      userId: user.id,
+      userId: user?.id,
       eventId: eventId,
       totalAmount: totalAmount,
       orderNumber: uuidv4(),
@@ -103,7 +103,7 @@ export default class OrderController {
     const user = auth.getUserOrFail()
     const { status, paymentIntentId } = request.qs()
 
-    const ordersQuery = Order.query().where('userId', user.id).preload('event').preload('tickets')
+    const ordersQuery = Order.query().where('userId', user?.id).preload('event').preload('tickets')
 
     if (paymentIntentId) {
       const order = await ordersQuery.where('paymentIntentId', paymentIntentId).first()
@@ -125,7 +125,7 @@ export default class OrderController {
 
     const order = await Order.query()
       .where('id', orderId)
-      .andWhere('userId', user.id)
+      .andWhere('userId', user?.id)
       .preload('event')
       .preload('tickets')
       .first()

@@ -34,7 +34,7 @@ export default class TicketTypeController {
     // Check if the authenticated user is an owner or admin of the organization that owns the event
     const event = await Event.findOrFail(eventId)
     const authUserMembership = await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', event.organizationId)
       .firstOrFail()
 
@@ -73,7 +73,7 @@ export default class TicketTypeController {
 
     const event = await Event.findOrFail(eventId)
     const authUserMembership = await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', event.organizationId)
       .firstOrFail()
 
@@ -107,7 +107,7 @@ export default class TicketTypeController {
     // Check if the authenticated user is an owner or admin of the organization that owns the event
     const event = await Event.findOrFail(eventId)
     const authUserMembership = await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', event.organizationId)
       .firstOrFail()
 

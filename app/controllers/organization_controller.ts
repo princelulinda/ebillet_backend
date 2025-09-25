@@ -30,11 +30,11 @@ export default class OrganizationController {
       name,
       description: description || null,
       logoUrl,
-      ownerId: user.id,
+      ownerId: user?.id,
     })
 
     await OrganizationMember.create({
-      userId: user.id,
+      userId: user?.id,
       organizationId: organization.id,
       role: 'admin',
     })
@@ -48,7 +48,7 @@ export default class OrganizationController {
 
     // 1. Authorize
     const authUserMembership = await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', organizationId)
       .firstOrFail()
 
@@ -110,7 +110,7 @@ export default class OrganizationController {
     await Organization.findOrFail(organizationId)
 
     const existingFollow = await UserFollow.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('followableId', organizationId)
       .where('followableType', 'Organization')
       .first()
@@ -120,7 +120,7 @@ export default class OrganizationController {
       return response.ok({ message: 'Successfully unfollowed.' })
     } else {
       await UserFollow.create({
-        userId: user.id,
+        userId: user?.id,
         followableId: Number(organizationId),
         followableType: 'Organization',
       })
@@ -132,7 +132,7 @@ export default class OrganizationController {
     const user = auth.getUserOrFail()
 
     const organizations = await Organization.query().whereIn('id', (subquery) => {
-      subquery.from('organization_members').where('user_id', user.id).select('organization_id')
+      subquery.from('organization_members').where('user_id', user?.id).select('organization_id')
     })
 
     return response.ok(organizations)
@@ -144,7 +144,7 @@ export default class OrganizationController {
 
     // Authorize
     await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', organizationId)
       .firstOrFail()
 
@@ -191,7 +191,7 @@ export default class OrganizationController {
 
     // Authorize
     await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', organizationId)
       .firstOrFail()
 

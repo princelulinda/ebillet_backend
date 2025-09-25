@@ -15,7 +15,7 @@ export default class OrganizationMembersController {
 
     // Check if the authenticated user is an owner or admin of the organization
     const authUserMembership = await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', organization.id)
       .firstOrFail()
 
@@ -32,7 +32,7 @@ export default class OrganizationMembersController {
 
     // Check if the user is already a member
     const existingMembership = await OrganizationMember.query()
-      .where('userId', memberUser.id)
+      .where('userId', memberuser?.id)
       .where('organizationId', organization.id)
       .first()
 
@@ -41,7 +41,7 @@ export default class OrganizationMembersController {
     }
 
     const organizationMember = await OrganizationMember.create({
-      userId: memberUser.id,
+      userId: memberuser?.id,
       organizationId: organization.id,
       role: role,
     })
@@ -68,7 +68,7 @@ export default class OrganizationMembersController {
 
     // Check if the authenticated user is an owner or admin of the organization
     const authUserMembership = await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', organization.id)
       .firstOrFail()
 
@@ -103,7 +103,7 @@ export default class OrganizationMembersController {
 
     // Check if the authenticated user is an owner or admin of the organization
     const authUserMembership = await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', organization.id)
       .firstOrFail()
 

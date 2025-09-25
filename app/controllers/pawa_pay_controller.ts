@@ -25,7 +25,7 @@ export default class PawaPayController {
     const depositId = uuidv4()
 
     const transaction = await Transaction.create({
-      userId: user.id,
+      userId: user?.id,
       orderId,
       amount,
       currency,

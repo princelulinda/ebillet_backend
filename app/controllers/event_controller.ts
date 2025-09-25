@@ -14,7 +14,7 @@ export default class EventController {
 
     // 1. Authorize user
     const authUserMembership = await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', organizationId)
       .firstOrFail()
 
@@ -71,7 +71,7 @@ export default class EventController {
 
     // 1. Authorize user
     const authUserMembership = await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', organizationId)
       .firstOrFail()
 
@@ -133,7 +133,7 @@ export default class EventController {
 
     // Check if the authenticated user is an owner or admin of the organization
     const authUserMembership = await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', organizationId)
       .firstOrFail()
 
@@ -170,7 +170,7 @@ export default class EventController {
     const eventId = params.id
 
     const authUserMembership = await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', organizationId)
       .firstOrFail()
 
@@ -213,7 +213,7 @@ export default class EventController {
 
     // Check if the authenticated user is an owner or admin of the organization
     const authUserMembership = await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', organizationId)
       .firstOrFail()
 
@@ -237,7 +237,7 @@ export default class EventController {
 
     // 1. Authorize
     const authUserMembership = await OrganizationMember.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('organizationId', organizationId)
       .firstOrFail()
 
@@ -264,9 +264,9 @@ export default class EventController {
     for (const ticket of tickets) {
       if (ticket.order && ticket.order.user) {
         const attendeeUser = ticket.order.user
-        if (!attendees.has(attendeeUser.id)) {
-          attendees.set(attendeeUser.id, {
-            id: attendeeUser.id,
+        if (!attendees.has(attendeeuser?.id)) {
+          attendees.set(attendeeuser?.id, {
+            id: attendeeuser?.id,
             fullName: attendeeUser.fullName,
             email: attendeeUser.email,
             profile: attendeeUser.profile,

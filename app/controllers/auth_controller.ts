@@ -19,11 +19,11 @@ export default class AuthController {
 
     try {
       const user = await User.create(payload)
-      await Profile.create({ userId: user.id })
+      await Profile.create({ userId: user?.id })
 
       const token = uuidv4()
       await EmailVerificationToken.create({
-        userId: user.id,
+        userId: user?.id,
         token: token,
         expiresAt: DateTime.now().plus({ hours: 24 }),
       })
@@ -57,7 +57,7 @@ export default class AuthController {
     }
 
     const emailVerificationToken = await EmailVerificationToken.query()
-      .where('userId', user.id)
+      .where('userId', user?.id)
       .where('token', token)
       .first()
 

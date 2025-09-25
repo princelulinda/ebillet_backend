@@ -7,7 +7,7 @@ export default class ProfileController {
     const user = auth.getUserOrFail()
     const payload = await request.validateUsing(updateProfileValidator)
 
-    const profile = await Profile.findByOrFail('userId', user.id)
+    const profile = await Profile.findByOrFail('userId', user?.id)
     profile.merge(payload)
     await profile.save()
 
