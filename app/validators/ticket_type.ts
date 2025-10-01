@@ -4,6 +4,7 @@ const ticketTypeSchema = vine.object({
   name: vine.string().minLength(3),
   description: vine.string().optional(),
   price: vine.number().min(0), // Allow 0 for free tickets
+  currency: vine.string().fixedLength(3),
   availableQuantity: vine.number().positive().min(1),
   maxPerOrder: vine.number().positive().min(1).optional(),
   saleStartDate: vine.date().optional(),

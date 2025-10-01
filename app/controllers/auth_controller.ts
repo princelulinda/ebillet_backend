@@ -61,7 +61,11 @@ export default class AuthController {
       .where('token', token)
       .first()
 
-        if (!emailVerificationToken || !emailVerificationToken.expiresAt || emailVerificationToken.expiresAt < DateTime.now()) {
+    if (
+      !emailVerificationToken ||
+      !emailVerificationToken.expiresAt ||
+      emailVerificationToken.expiresAt < DateTime.now()
+    ) {
       return response.badRequest({ message: 'Invalid or expired token.' })
     }
 
@@ -97,6 +101,9 @@ export default class AuthController {
   async me({ auth, response }: HttpContext) {
     const user = auth.getUserOrFail()
     await user.load('profile')
+    await user.load('organizationMemberships', (query) => {
+      query.preload('organization')
+    })
     return response.ok(user)
   }
 

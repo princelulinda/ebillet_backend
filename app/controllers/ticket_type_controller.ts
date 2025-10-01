@@ -2,13 +2,9 @@ import { HttpContext } from '@adonisjs/core/http'
 import TicketType from '#models/ticket_type'
 import Event from '#models/event'
 import OrganizationMember from '#models/organization_member'
-import {
-  createTicketTypesValidator,
-  updateTicketTypeValidator,
-} from '#validators/ticket_type'
+import { createTicketTypesValidator, updateTicketTypeValidator } from '#validators/ticket_type'
 import db from '@adonisjs/lucid/services/db'
 import { DateTime } from 'luxon'
-
 
 export default class TicketTypeController {
   async index({ response, params }: HttpContext) {
@@ -31,7 +27,6 @@ export default class TicketTypeController {
     const user = auth.getUserOrFail()
     const eventId = params.eventId
 
-    // Check if the authenticated user is an owner or admin of the organization that owns the event
     const event = await Event.findOrFail(eventId)
     const authUserMembership = await OrganizationMember.query()
       .where('userId', user?.id)
@@ -91,8 +86,10 @@ export default class TicketTypeController {
 
     ticketType.merge({
       ...restOfPayload,
-      saleStartDate: saleStartDate !== undefined ? DateTime.fromJSDate(saleStartDate) : ticketType.saleStartDate,
-      saleEndDate: saleEndDate !== undefined ? DateTime.fromJSDate(saleEndDate) : ticketType.saleEndDate,
+      saleStartDate:
+        saleStartDate !== undefined ? DateTime.fromJSDate(saleStartDate) : ticketType.saleStartDate,
+      saleEndDate:
+        saleEndDate !== undefined ? DateTime.fromJSDate(saleEndDate) : ticketType.saleEndDate,
     })
     await ticketType.save()
 

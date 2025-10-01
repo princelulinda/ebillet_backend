@@ -13,6 +13,7 @@ import UserFollow from '#models/user_follow'
 import EmailVerificationToken from '#models/email_verification_token'
 import type { HasMany, HasOne } from '@adonisjs/lucid/types/relations'
 import Profile from '#models/profile'
+import OrganizationMember from '#models/organization_member'
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
   uids: ['email'],
@@ -66,4 +67,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @hasOne(() => Profile)
   declare profile: HasOne<typeof Profile>
+
+  @hasMany(() => OrganizationMember)
+  declare organizationMemberships: HasMany<typeof OrganizationMember>
 }

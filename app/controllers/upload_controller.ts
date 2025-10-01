@@ -12,8 +12,6 @@ export default class UploadController {
       name: fileName,
     })
 
-    
-
     // Construct the full URL
     const protocol = request.protocol()
     const host = request.host()

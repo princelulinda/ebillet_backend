@@ -47,7 +47,10 @@ export default class EventController {
     const statsByEventId = new Map<number, { totalRevenue: number; ticketsSold: number }>()
 
     for (const ticket of tickets) {
-      const stats = statsByEventId.get((ticket as any).eventId) || { totalRevenue: 0, ticketsSold: 0 }
+      const stats = statsByEventId.get((ticket as any).eventId) || {
+        totalRevenue: 0,
+        ticketsSold: 0,
+      }
       stats.totalRevenue += ticket.price
       stats.ticketsSold += 1
       statsByEventId.set((ticket as any).eventId, stats)
@@ -68,6 +71,10 @@ export default class EventController {
   async show({ auth, response, params }: HttpContext) {
     const user = auth.getUserOrFail()
     const { organizationId, id: eventId } = params
+
+    if (typeof eventId !== 'string' || !/^\d+$/.test(eventId) || parseInt(eventId, 10) <= 0) {
+      return response.badRequest({ message: 'Invalid event ID provided.' });
+    }
 
     // 1. Authorize user
     const authUserMembership = await OrganizationMember.query()
@@ -169,6 +176,10 @@ export default class EventController {
     const organizationId = params.organizationId
     const eventId = params.id
 
+    if (typeof eventId !== 'string' || !/^\d+$/.test(eventId) || parseInt(eventId, 10) <= 0) {
+      return response.badRequest({ message: 'Invalid event ID provided.' });
+    }
+
     const authUserMembership = await OrganizationMember.query()
       .where('userId', user?.id)
       .where('organizationId', organizationId)
@@ -211,6 +222,10 @@ export default class EventController {
     const organizationId = params.organizationId
     const eventId = params.id
 
+    if (typeof eventId !== 'string' || !/^\d+$/.test(eventId) || parseInt(eventId, 10) <= 0) {
+      return response.badRequest({ message: 'Invalid event ID provided.' });
+    }
+
     // Check if the authenticated user is an owner or admin of the organization
     const authUserMembership = await OrganizationMember.query()
       .where('userId', user?.id)
@@ -235,6 +250,10 @@ export default class EventController {
     const user = auth.getUserOrFail()
     const { organizationId, id: eventId } = params
 
+    if (typeof eventId !== 'string' || !/^\d+$/.test(eventId) || parseInt(eventId, 10) <= 0) {
+      return response.badRequest({ message: 'Invalid event ID provided.' });
+    }
+
     // 1. Authorize
     const authUserMembership = await OrganizationMember.query()
       .where('userId', user?.id)
@@ -257,19 +276,32 @@ export default class EventController {
           userQuery.preload('profile')
         })
       })
+      .preload('ticketType') // Preload the ticketType relationship
       .select('tickets.*') // Select all columns from the tickets table
 
-    // 4. Deduplicate and format attendees
+    // 4. Group tickets by attendee
     const attendees = new Map()
     for (const ticket of tickets) {
       if (ticket.order && ticket.order.user) {
         const attendeeUser = ticket.order.user
-        if (!attendees.has(attendeeuser?.id)) {
-          attendees.set(attendeeuser?.id, {
-            id: attendeeuser?.id,
+        if (!attendees.has(attendeeUser.id)) {
+          attendees.set(attendeeUser.id, {
+            id: attendeeUser.id,
             fullName: attendeeUser.fullName,
             email: attendeeUser.email,
             profile: attendeeUser.profile,
+            tickets: [],
+          })
+        }
+
+        const attendeeData = attendees.get(attendeeUser.id)
+        if (attendeeData) {
+          attendeeData.tickets.push({
+            id: ticket.id,
+            ticketType: ticket.ticketType.name,
+            status: ticket.status,
+            price: ticket.price,
+            qrCodeHash: ticket.qrCodeHash,
           })
         }
       }

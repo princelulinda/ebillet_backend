@@ -36,7 +36,7 @@ export default class OrganizationController {
     await OrganizationMember.create({
       userId: user?.id,
       organizationId: organization.id,
-      role: 'admin',
+      role: 'owner',
     })
 
     return response.created(organization)
@@ -169,7 +169,7 @@ export default class OrganizationController {
     const transactions = orders.map((order) => ({
       id: order.orderNumber,
       amount: order.totalAmount,
-      currency: 'usd', // Assuming currency is static for now
+      currency: 'usd',
       date: order.createdAt.toISO(),
       status: order.status,
       customer: {

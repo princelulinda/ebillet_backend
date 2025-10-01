@@ -9,7 +9,13 @@ export default class extends BaseSchema {
 
     // 2. Add category_id to the events table
     this.schema.alterTable(this.tableName, (table) => {
-      table.integer('category_id').unsigned().references('id').inTable('categories').onDelete('SET NULL').nullable()
+      table
+        .integer('category_id')
+        .unsigned()
+        .references('id')
+        .inTable('categories')
+        .onDelete('SET NULL')
+        .nullable()
       // Using SET NULL and nullable() because existing events might not have a category,
       // or if a category is deleted, events should not be deleted.
       // If category is mandatory, change to .notNullable() and handle existing data.
@@ -26,7 +32,12 @@ export default class extends BaseSchema {
     this.schema.createTable('event_categories', (table) => {
       table.increments('id')
       table.integer('event_id').unsigned().references('id').inTable('events').onDelete('CASCADE')
-      table.integer('category_id').unsigned().references('id').inTable('categories').onDelete('CASCADE')
+      table
+        .integer('category_id')
+        .unsigned()
+        .references('id')
+        .inTable('categories')
+        .onDelete('CASCADE')
       table.unique(['event_id', 'category_id'])
     })
   }

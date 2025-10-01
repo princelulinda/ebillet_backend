@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Ticket from '#models/ticket'
+import TransportationTicket from '#models/transportation_ticket'
 import UserFollow from '#models/user_follow'
 import Organization from '#models/organization'
 
@@ -15,6 +16,24 @@ export default class UserController {
       .preload('ticketType')
 
     return response.ok(tickets)
+  }
+
+  async listMyTransportationTickets({ auth, response }: HttpContext) {
+    const user = auth.getUserOrFail()
+
+    const transportationTickets = await TransportationTicket.query()
+      .where('userId', user?.id)
+      .preload('order')
+      .preload('transportationTicketType', (ticketTypeQuery) => {
+        ticketTypeQuery.preload('schedule', (scheduleQuery) => {
+          scheduleQuery.preload('route', (routeQuery) => {
+            routeQuery.preload('originLocation')
+            routeQuery.preload('destinationLocation')
+          })
+        })
+      })
+
+    return response.ok(transportationTickets)
   }
 
   async listFollowedOrganizations({ auth, response }: HttpContext) {

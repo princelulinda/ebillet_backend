@@ -19,8 +19,7 @@ class PawaPayService {
     customerMessage: string,
     metadata: any[]
   ) {
-    const url = new URL('v2/deposits', this.pawaPayUrl)
-    console.log(url)
+    const url = new URL('deposits/', this.pawaPayUrl)
     const response = await fetch(url.href, {
       method: 'POST',
       headers: {
@@ -36,7 +35,7 @@ class PawaPayService {
       body: JSON.stringify({
         depositId,
         amount,
-        currency,
+        currency: 'USD',
         payer: {
           type: 'MMO',
           accountDetails: {
@@ -56,7 +55,6 @@ class PawaPayService {
       console.log(r, provider, phoneNumber, amount, currency, depositId)
       throw new Error('Failed to create deposit with PawaPay')
     }
-
     return response.json()
   }
 
@@ -75,11 +73,31 @@ class PawaPayService {
         Authorization: `Bearer ${this.apiKey}`,
       },
     })
+    if (!response.ok) {
+      const error = await response.json()
+      console.log(error)
+      throw new Error('Failed to get active configuration from PawaPay')
+    }
+
+    return response.json()
+  }
+
+  async getDepositStatus(depositId: string) {
+    const url = new URL(`/deposits/${depositId}`, this.pawaPayUrl)
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    })
 
     if (!response.ok) {
       const error = await response.json()
       console.log(error)
-      throw new Error( 'Failed to get active configuration from PawaPay')
+      throw new Error('Failed to get deposit status from PawaPay')
     }
 
     return response.json()

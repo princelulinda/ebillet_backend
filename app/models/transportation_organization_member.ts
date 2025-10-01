@@ -1,9 +1,10 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
 import User from '#models/user'
+import TransportationOrganization from '#models/transportation_organization'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 
-export default class UserFollow extends BaseModel {
+export default class TransportationOrganizationMember extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 
@@ -11,17 +12,20 @@ export default class UserFollow extends BaseModel {
   declare userId: number
 
   @column()
-  declare followableId: number
+  declare transportationOrganizationId: number
 
   @column()
-  declare followableType: string
+  declare role: string
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
+  declare updatedAt: DateTime
 
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>
+
+  @belongsTo(() => TransportationOrganization)
+  declare transportationOrganization: BelongsTo<typeof TransportationOrganization>
 }

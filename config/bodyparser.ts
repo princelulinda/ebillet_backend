@@ -27,7 +27,6 @@ const bodyParserConfig = defineConfig({
       'application/vnd.api+json',
       'application/csp-report',
     ],
-    
   },
 
   /**
